@@ -6,14 +6,8 @@ const postSchema = new Schema(
       required: true,
       trim: true,
     },
-    slug: {
-      type: String,
-      required: true,
-      unique: true,
-      index: true,
-    },
     content: {
-      type: mongoose.Schema.Types.Mixed,
+      type: Schema.Types.Mixed,
       required: true,
     },
     game: {

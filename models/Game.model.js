@@ -17,7 +17,10 @@ const gameSchema = new Schema(
       type: String,
       required: true,
     },
-
+    cover: {
+      type: [String],
+      required: true,
+    },
     images: {
       type: [String],
     },
@@ -30,7 +33,6 @@ const gameSchema = new Schema(
     timestamps: true,
   },
 )
-
 
 const Game = model("Game", gameSchema)
 

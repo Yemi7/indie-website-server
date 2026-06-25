@@ -16,6 +16,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       trim: true,
+      unique: true,
     },
     profilePic: {
       type: String,
@@ -23,8 +24,8 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      required: true,
       enum: ["user", "dev", "admin"],
+      default: "user",
     },
   },
   {
