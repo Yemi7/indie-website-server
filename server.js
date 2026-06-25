@@ -1,52 +1,32 @@
 process.loadEnvFile()
 
+//app imports express
 const express = require("express")
-const logger = require("morgan")
-const cors = require("cors")
-
 const app = express()
 
+//config middleware
+const config = require("./config")
+config(app)
+
 //connection to the database
-const mongoose = require("mongoose")
-
-const connectDB = async () => {
-  //stop duplicate connection problems on some hosting services
-  if (mongoose.connection.readyState === 1) {
-    return
-  }
-
-  try {
-    const response = await mongoose.connect(process.env.MONGO_URI)
-    const dbName = response.connections[0].name
-    console.log(`Connected to mongo! Database name: "${dbName}"`)
-  } catch (error) {
-    console.error("Error connecting to mongo:", error)
-  }
-}
-
+const connectDB = require("./db")
 app.use(async (req, res, next) => {
   await connectDB()
   next()
 })
 
-// Allows express to trust reverse proxies when using deploy services
-app.set("trust proxy", 1)
-
-// Sets cors to only send information to specified origin port
-app.use(cors({ origin: [process.env.ORIGIN] }))
-
-// logs requests in dev enviroment using morgan
-app.use(logger("dev"))
-
-// parses the incoming JSON requests
-app.use(express.json())
-
-//parses income request bodies with URL encoded data
-app.use(express.urlencoded({ extended: false }))
-
+// highest level route
 app.get("/", (req, res, next) => {
-  res.json("Up and Running")
+  res.json("Up and running")
 })
+
+// routes
+const indexRouter = require("./routes/index.routes")
+app.use("/api", indexRouter)
+
+// error handling
+const errorHandler = require("./errors")
+errorHandler(app)
 
 // server listener
 const PORT = process.env.PORT || 5005
@@ -54,3 +34,21 @@ const PORT = process.env.PORT || 5005
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`)
 })
+
+/* 
+Crud operations
+. Get a list of games, populated with it's dev
+. Get an individual game, populated with posts and its dev
+. Create a game with relation to it's dev 
+. Edit a games details based on the dev verification
+. Get an indiviual post with its data(content)
+. Create a post with relation to it's game based on the user verifcation
+. Edit a posts details based on the user verification (needs to get the "data" "content")
+. Create a comment related to it's post and it's user
+. Edit a comment related to it's post and based on it's user verification
+. Create a user (signup)
+. Login with a user (login)
+. Change a user role to dev
+
+
+*/
