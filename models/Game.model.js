@@ -2,7 +2,7 @@ const { Schema, model } = require("mongoose")
 const gameSchema = new Schema(
   {
     title: {
-      type: [String],
+      type: String,
       required: true,
     },
     startDate: {
@@ -16,18 +16,21 @@ const gameSchema = new Schema(
     engine: {
       type: String,
       required: true,
+      // implement enum for established engines
     },
     cover: {
-      type: [String],
+      type: String,
       required: true,
     },
     images: {
       type: [String],
+      // array of objs with string url and text
     },
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+    // status of the game
   },
   {
     timestamps: true,

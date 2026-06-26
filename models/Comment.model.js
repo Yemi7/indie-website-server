@@ -1,15 +1,6 @@
 const { Schema, model } = require("mongoose")
 const commentSchema = new Schema(
   {
-    username: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    profilePic: {
-      type: String,
-      default: "Placeholder url",
-    },
     description: {
       type: String,
       required: true,

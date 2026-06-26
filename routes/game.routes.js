@@ -1,8 +1,9 @@
 const router = require("express").Router()
+const { verifyToken } = require("../middleware/auth.middlewares")
 const Game = require("../models/Game.model")
 // create a game
-router.post("/", async (req, res, next) => {
-  console.log(req.body)
+router.post("/", verifyToken, async (req, res, next) => {
+  console.log(req.payload)
   const newGame = {
     title: req.body.title,
     startDate: req.body.startDate,
@@ -10,8 +11,10 @@ router.post("/", async (req, res, next) => {
     engine: req.body.engine,
     images: req.body.images,
     cover: req.body.cover,
+    user: req.payload._id,
   }
   try {
+    // implement security check so only the user can create a game
     const response = await Game.create(newGame)
     res.json(response)
     // implement error message for
@@ -24,7 +27,10 @@ router.post("/", async (req, res, next) => {
 // get a list of games
 router.get("/", async (req, res, next) => {
   try {
-    const response = await Game.find({})
+    const response = await Game.find(req.params).populate(
+      "user",
+      "username profilePic",
+    )
     res.json(response)
   } catch (error) {
     next(error)
@@ -35,7 +41,10 @@ router.get("/", async (req, res, next) => {
 router.get("/:gameId", async (req, res, next) => {
   console.log(req.params)
   try {
-    const response = await Game.findById(req.params.gameId)
+    const response = await Game.findById(req.params.gameId).populate(
+      "user",
+      "username profilePic",
+    )
     res.json(response)
   } catch (error) {
     next(error)
@@ -43,12 +52,14 @@ router.get("/:gameId", async (req, res, next) => {
 })
 
 // update an individual game
-router.patch("/:gameId", async (req, res, next) => {
+router.patch("/:gameId", verifyToken, async (req, res, next) => {
   console.log(req.params)
   // deconstructing the body
   const { title, startDate, expectedRelease, engine, cover, images } = req.body
 
   try {
+    // implement security check so only the user can update a game
+
     const updatedGame = {
       title,
       startDate,
@@ -69,8 +80,8 @@ router.patch("/:gameId", async (req, res, next) => {
   // implementation for verifyToken and verifyDev needs to be added
 })
 
-// delete a game
-router.delete("/:gameId", async (req, res, next) => {
+// delete a game, only done in rare cases
+router.delete("/:gameId", verifyToken, async (req, res, next) => {
   console.log(req.params)
   // need to implement deleting the gameId being filtered out of a related dev
   try {
@@ -80,5 +91,10 @@ router.delete("/:gameId", async (req, res, next) => {
     next(error)
   }
 })
+/* 
+possible routes,
+  get all games by userId in payload, for devs to see
+  a status change for relased, in development and cancelled games
+*/
 
 module.exports = router
