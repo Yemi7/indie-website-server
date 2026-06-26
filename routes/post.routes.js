@@ -22,7 +22,9 @@ router.post("/", verifyToken, async (req, res, next) => {
 // list all posts
 router.get("/", async (req, res, next) => {
   try {
-    const response = await Post.find(req.params).populate("game")
+    const response = await Post.find(req.params)
+      .populate("game", "title cover engine")
+      .populate("user", "username profilePic")
     res.json(response)
   } catch (error) {
     next(error)
@@ -33,7 +35,9 @@ router.get("/", async (req, res, next) => {
 router.get("/:postId", async (req, res, next) => {
   console.log(req.params)
   try {
-    const response = await Post.findById(req.params.postId).populate("game")
+    const response = await Post.findById(req.params.postId)
+      .populate("game", "title cover engine")
+      .populate("user", "username profilePic")
     res.json(response)
   } catch (error) {
     next(error)
@@ -68,5 +72,9 @@ router.delete("/:postId", verifyToken, async (req, res, next) => {
     next(error)
   }
 })
+/* 
+possible routes,
+  route that gets a list of posts in descending order of their created at time
+*/
 
 module.exports = router
