@@ -9,7 +9,7 @@ router.post("/", verifyToken, async (req, res, next) => {
     title: req.body.title,
     content: req.body.content,
     user: req.payload._id,
-    game: req.body.game, // the user will be on a game details page when making the post, it's id can be sent from there
+    game: req.body.game, // the user will be on a game details page when making the post, it's id can be sent from there as params.
   }
   try {
     const response = await Post.create(newPost)
@@ -20,9 +20,10 @@ router.post("/", verifyToken, async (req, res, next) => {
 })
 
 // list all posts
-router.get("/", async (req, res, next) => {
+// Should only call posts for a specific game
+router.get("/:gameId/by-game", async (req, res, next) => {
   try {
-    const response = await Post.find(req.params)
+    const response = await Post.find(req.params) // add game id check here
       .populate("game", "title cover engine")
       .populate("user", "username profilePic")
     res.json(response)
@@ -32,6 +33,7 @@ router.get("/", async (req, res, next) => {
 })
 
 // find post by id
+// could possibly call comments in this request
 router.get("/:postId", async (req, res, next) => {
   console.log(req.params)
   try {
@@ -46,6 +48,8 @@ router.get("/:postId", async (req, res, next) => {
 
 // update a post
 router.patch("/:postId", verifyToken, async (req, res, next) => {
+  // use findOne to implement check for userId before editing their own post
+
   console.log(req.body)
   const { title, content, user, game } = req.body
   try {
@@ -65,6 +69,8 @@ router.patch("/:postId", verifyToken, async (req, res, next) => {
 router.delete("/:postId", verifyToken, async (req, res, next) => {
   console.log(req.params)
   // need to implement deleting the post being filtered out of a related dev and game
+  // use findOne to implement check for userId before deleting their own post
+
   try {
     const response = await Post.findByIdAndDelete(req.params.postId)
     res.json(response)

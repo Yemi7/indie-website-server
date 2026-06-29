@@ -4,14 +4,7 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const { verifyToken } = require("../middleware/auth.middlewares")
 
-//test
-router.get("/test", async (req, res, next) => {
-  try {
-    res.send("auth route working")
-  } catch (error) {
-    next(error)
-  }
-})
+
 // signup route
 router.post("/signup", async (req, res, next) => {
   console.log(req.body)

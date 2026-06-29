@@ -55,6 +55,8 @@ router.get("/:gameId", async (req, res, next) => {
 router.patch("/:gameId", verifyToken, async (req, res, next) => {
   console.log(req.params)
   // deconstructing the body
+  // use findOne to implement check for userId before updating their own game
+
   const { title, startDate, expectedRelease, engine, cover, images } = req.body
 
   try {
@@ -84,6 +86,7 @@ router.patch("/:gameId", verifyToken, async (req, res, next) => {
 router.delete("/:gameId", verifyToken, async (req, res, next) => {
   console.log(req.params)
   // need to implement deleting the gameId being filtered out of a related dev
+  // use findOne to implement check for userId
   try {
     const response = await Game.findByIdAndDelete(req.params.gameId)
     res.json(response)

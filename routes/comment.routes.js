@@ -22,7 +22,8 @@ router.post("/", verifyToken, async (req, res, next) => {
 })
 
 // list all comments
-router.get("/", async (req, res, next) => {
+// change to find comments in specific post
+router.get("/:commentId/by-comment", async (req, res, next) => {
   try {
     const response = await Comment.find(req.params)
       .populate("post", "title")
@@ -34,6 +35,7 @@ router.get("/", async (req, res, next) => {
 })
 
 // find comment by id
+// redundant
 router.get("/:commentId", async (req, res, next) => {
   console.log(req.params)
   try {
@@ -47,6 +49,7 @@ router.get("/:commentId", async (req, res, next) => {
 })
 
 // update a comment
+// use findOne to implement check for userId before editing their own comment
 router.patch("/:commentId", verifyToken, async (req, res, next) => {
   console.log(req.body)
   const { username, profilePic, description, user, post } = req.body
@@ -64,6 +67,7 @@ router.patch("/:commentId", verifyToken, async (req, res, next) => {
 })
 
 // delete a comment
+// use findOne to implement check for userId before deleting their own comment
 router.delete("/:commentId", verifyToken, async (req, res, next) => {
   console.log(req.params)
   // need to implement deleting the comments being filtered out of a related dev and post
@@ -74,4 +78,5 @@ router.delete("/:commentId", verifyToken, async (req, res, next) => {
     next(error)
   }
 })
+
 module.exports = router
