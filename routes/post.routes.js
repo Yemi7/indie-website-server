@@ -19,11 +19,13 @@ router.post("/", verifyToken, async (req, res, next) => {
   }
 })
 
-// list all posts
-// Should only call posts for a specific game
+// lists posts made on a game
 router.get("/:gameId/by-game", async (req, res, next) => {
+  console.log(req.params)
   try {
-    const response = await Post.find(req.params) // add game id check here
+    const response = await Post.find({
+      game: req.params.gameId,
+    }) // add game id check here
       .populate("game", "title cover engine")
       .populate("user", "username profilePic")
     res.json(response)

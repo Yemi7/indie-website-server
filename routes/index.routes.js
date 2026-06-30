@@ -16,6 +16,10 @@ router.use("/post", postRouter)
 const commentRouter = require("./comment.routes")
 router.use("/comment", commentRouter)
 
+// image upload routes
+const uploadRoutes = require("./upload.routes")
+router.use("/upload", uploadRoutes)
+
 // test
 router.get("/example", async (req, res, next) => {
   try {

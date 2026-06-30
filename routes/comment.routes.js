@@ -21,25 +21,13 @@ router.post("/", verifyToken, async (req, res, next) => {
   }
 })
 
-// list all comments
+// list comments on a specific post
 // change to find comments in specific post
-router.get("/:commentId/by-comment", async (req, res, next) => {
+router.get("/:postId/by-post", async (req, res, next) => {
   try {
-    const response = await Comment.find(req.params)
-      .populate("post", "title")
-      .populate("user", "username profilePic")
-    res.json(response)
-  } catch (error) {
-    next(error)
-  }
-})
-
-// find comment by id
-// redundant
-router.get("/:commentId", async (req, res, next) => {
-  console.log(req.params)
-  try {
-    const response = await Comment.findById(req.params.commentId)
+    const response = await Comment.find({
+      post: req.params.postId,
+    })
       .populate("post", "title")
       .populate("user", "username profilePic")
     res.json(response)
