@@ -26,4 +26,22 @@ router.post("/upload-many", uploader.array("images", 5), (req, res, next) => {
   res.json({ imageUrls })
 })
 
+router.post("/upload-editor", uploader.single("image"), (req, res, next) => {
+  if (!req.file) {
+    res.status(400).json({
+      success: 0,
+      message:
+        "There was a problem uploading the image. Check image format and size",
+    })
+    return
+  }
+
+  res.json({
+    success: 1,
+    file: {
+      url: req.file.path,
+    },
+  })
+})
+
 module.exports = router

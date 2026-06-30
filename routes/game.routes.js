@@ -1,6 +1,7 @@
 const router = require("express").Router()
 const { verifyToken } = require("../middleware/auth.middlewares")
 const Game = require("../models/Game.model")
+const Post = require("../models/Post.model")
 // create a game
 router.post("/", verifyToken, async (req, res, next) => {
   console.log(req.payload)
@@ -14,11 +15,10 @@ router.post("/", verifyToken, async (req, res, next) => {
     user: req.payload._id,
   }
   try {
-    // implement security check so only the user can create a game
+    //! implement security check so only a user can create a game
     const response = await Game.create(newGame)
     res.json(response)
-    // implement error message for
-    // implement adding a relation to it's user once user routes are created
+    //! implement error message for when it fails
   } catch (error) {
     next(error)
   }
@@ -54,9 +54,9 @@ router.get("/:gameId", async (req, res, next) => {
 // update an individual game
 router.patch("/:gameId", verifyToken, async (req, res, next) => {
   console.log(req.params)
-  // deconstructing the body
-  // use findOne to implement check for userId before updating their own game
+  //! use findOne to implement check for userId before updating their own game
 
+  // deconstructing the body
   const { title, startDate, expectedRelease, engine, cover, images } = req.body
 
   try {
@@ -82,14 +82,15 @@ router.patch("/:gameId", verifyToken, async (req, res, next) => {
   // implementation for verifyToken and verifyDev needs to be added
 })
 
-// delete a game, only done in rare cases
+//! implement only an admin being able to delete a game
 router.delete("/:gameId", verifyToken, async (req, res, next) => {
   console.log(req.params)
-  // need to implement deleting the gameId being filtered out of a related dev
-  // use findOne to implement check for userId
   try {
-    const response = await Game.findByIdAndDelete(req.params.gameId)
-    res.json(response)
+    const postDeletions = await Post.deleteMany({
+      game: req.params.gameId,
+    })
+    const gameDelete = await Game.findByIdAndDelete(req.params.gameId)
+    res.json(postDeletions, gameDelete)
   } catch (error) {
     next(error)
   }

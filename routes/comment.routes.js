@@ -11,7 +11,6 @@ router.post("/", verifyToken, async (req, res, next) => {
     description: req.body.description,
     user: req.payload._id,
     post: req.body.post, //will be on a post details page that contains the id of the post
-    //need to add relations to user and game
   }
   try {
     const response = await Comment.create(newComment)
@@ -22,7 +21,6 @@ router.post("/", verifyToken, async (req, res, next) => {
 })
 
 // list comments on a specific post
-// change to find comments in specific post
 router.get("/:postId/by-post", async (req, res, next) => {
   try {
     const response = await Comment.find({
@@ -37,7 +35,7 @@ router.get("/:postId/by-post", async (req, res, next) => {
 })
 
 // update a comment
-// use findOne to implement check for userId before editing their own comment
+//! use findOne to implement check for userId before editing their own comment
 router.patch("/:commentId", verifyToken, async (req, res, next) => {
   console.log(req.body)
   const { username, profilePic, description, user, post } = req.body
@@ -55,10 +53,9 @@ router.patch("/:commentId", verifyToken, async (req, res, next) => {
 })
 
 // delete a comment
-// use findOne to implement check for userId before deleting their own comment
+//! use findOne to implement check for userId before deleting their own comment
 router.delete("/:commentId", verifyToken, async (req, res, next) => {
   console.log(req.params)
-  // need to implement deleting the comments being filtered out of a related dev and post
   try {
     const response = await Comment.findByIdAndDelete(req.params.commentId)
     res.json(response)

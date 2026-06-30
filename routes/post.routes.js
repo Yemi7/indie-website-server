@@ -2,6 +2,7 @@ const router = require("express").Router()
 const { verifyToken } = require("../middleware/auth.middlewares")
 const Post = require("../models/Post.model")
 const Game = require("../models/Game.model")
+const Comment = require("../models/Comment.model")
 // create post route
 router.post("/", verifyToken, async (req, res, next) => {
   console.log(req.body)
@@ -12,6 +13,7 @@ router.post("/", verifyToken, async (req, res, next) => {
     game: req.body.game, // the user will be on a game details page when making the post, it's id can be sent from there as params.
   }
   try {
+    //! use findOne to implement check for userId before creating their own post
     const response = await Post.create(newPost)
     res.json(response)
   } catch (error) {
@@ -35,7 +37,6 @@ router.get("/:gameId/by-game", async (req, res, next) => {
 })
 
 // find post by id
-// could possibly call comments in this request
 router.get("/:postId", async (req, res, next) => {
   console.log(req.params)
   try {
@@ -50,7 +51,7 @@ router.get("/:postId", async (req, res, next) => {
 
 // update a post
 router.patch("/:postId", verifyToken, async (req, res, next) => {
-  // use findOne to implement check for userId before editing their own post
+  //! use findOne to implement check for userId before editing their own post
 
   console.log(req.body)
   const { title, content, user, game } = req.body
@@ -67,15 +68,18 @@ router.patch("/:postId", verifyToken, async (req, res, next) => {
   }
 })
 
-// delete a post, only to be done in rare cases
+//! implement only an admin deleting posts
 router.delete("/:postId", verifyToken, async (req, res, next) => {
   console.log(req.params)
-  // need to implement deleting the post being filtered out of a related dev and game
-  // use findOne to implement check for userId before deleting their own post
 
   try {
-    const response = await Post.findByIdAndDelete(req.params.postId)
-    res.json(response)
+    const commentDeletions = await Comment.deleteMany({
+      post: req.params.postId,
+    })
+    const postDelete = await Post.findByIdAndDelete(req.params.postId)
+    res.json(commentDeletions, postDelete)
+    // const response = await Post.findByIdAndDelete(req.params.postId)
+    // res.json(response)
   } catch (error) {
     next(error)
   }
