@@ -68,16 +68,18 @@ router.patch("/:postId", verifyToken, async (req, res, next) => {
   }
 })
 
+const deletePostAndComments = async (postId) => {
+  await Comment.deleteMany({ post: postId })
+  return await Post.findByIdAndDelete(postId)
+}
+
 //! implement only an admin deleting posts
 router.delete("/:postId", verifyToken, async (req, res, next) => {
   console.log(req.params)
 
   try {
-    const commentDeletions = await Comment.deleteMany({
-      post: req.params.postId,
-    })
-    const postDelete = await Post.findByIdAndDelete(req.params.postId)
-    res.json(commentDeletions, postDelete)
+    const response = await deletePostAndComments(req.params.postId)
+    res.json(response)
     // const response = await Post.findByIdAndDelete(req.params.postId)
     // res.json(response)
   } catch (error) {
@@ -90,3 +92,4 @@ possible routes,
 */
 
 module.exports = router
+module.exports.deletePostAndComments = deletePostAndComments

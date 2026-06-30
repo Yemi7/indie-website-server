@@ -2,6 +2,7 @@ const router = require("express").Router()
 const { verifyToken } = require("../middleware/auth.middlewares")
 const Game = require("../models/Game.model")
 const Post = require("../models/Post.model")
+const { deletePostAndComments } = require("./post.routes")
 // create a game
 router.post("/", verifyToken, async (req, res, next) => {
   console.log(req.payload)
@@ -86,11 +87,11 @@ router.patch("/:gameId", verifyToken, async (req, res, next) => {
 router.delete("/:gameId", verifyToken, async (req, res, next) => {
   console.log(req.params)
   try {
-    const postDeletions = await Post.deleteMany({
-      game: req.params.gameId,
-    })
-    const gameDelete = await Game.findByIdAndDelete(req.params.gameId)
-    res.json(postDeletions, gameDelete)
+    const posts = await Post.find({ game: req.params.gameId })
+    await Promise.all(posts.map((post) => deletePostAndComments(post._id)))
+
+    const response = await Game.findByIdAndDelete(req.params.gameId)
+    res.json(response)
   } catch (error) {
     next(error)
   }
