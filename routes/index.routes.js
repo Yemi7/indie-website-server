@@ -8,17 +8,25 @@ router.use("/auth", authRouter)
 const gameRouter = require("./game.routes")
 router.use("/game", gameRouter)
 
-// game routes
+// post routes
 const postRouter = require("./post.routes")
 router.use("/post", postRouter)
 
-// game routes
+// comment routes
 const commentRouter = require("./comment.routes")
 router.use("/comment", commentRouter)
 
 // image upload routes
 const uploadRoutes = require("./upload.routes")
 router.use("/upload", uploadRoutes)
+
+// user routes
+const userRoutes = require("./user.routes")
+router.use("/user", userRoutes)
+
+// home routes
+const homeRoutes = require("./home.routes")
+router.use("/home", homeRoutes)
 
 // test
 router.get("/example", async (req, res, next) => {
