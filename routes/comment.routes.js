@@ -35,15 +35,26 @@ router.get("/:postId/by-post", async (req, res, next) => {
 })
 
 // update a comment
-//! use findOne to implement check for userId before editing their own comment
 router.patch("/:commentId", verifyToken, async (req, res, next) => {
   console.log(req.body)
   const { username, profilePic, description, user, post } = req.body
+
   try {
-    const upadtedComment = { username, profilePic, description, user, post }
+    const commentToUpdate = await Comment.findOne({
+      _id: req.params.commentId,
+      user: req.payload._id,
+    })
+
+    if (!commentToUpdate) {
+      return res
+        .status(403)
+        .json({ errorMessage: "You are not allowed to update this comment" })
+    }
+
+    const updatedComment = { username, profilePic, description, user, post }
     const response = await Comment.findByIdAndUpdate(
       req.params.commentId,
-      upadtedComment,
+      updatedComment,
       { new: true },
     )
     res.json(response)
@@ -53,10 +64,20 @@ router.patch("/:commentId", verifyToken, async (req, res, next) => {
 })
 
 // delete a comment
-//! use findOne to implement check for userId before deleting their own comment
 router.delete("/:commentId", verifyToken, async (req, res, next) => {
   console.log(req.params)
   try {
+    const commentToDelete = await Comment.findOne({
+      _id: req.params.commentId,
+      user: req.payload._id,
+    })
+
+    if (!commentToDelete) {
+      return res
+        .status(403)
+        .json({ errorMessage: "You are not allowed to delete this comment" })
+    }
+
     const response = await Comment.findByIdAndDelete(req.params.commentId)
     res.json(response)
   } catch (error) {

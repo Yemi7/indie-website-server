@@ -13,11 +13,11 @@ function verifyToken(req, res, next) {
   }
 }
 // Checks if the token of the user has a dev role
-function verifyDev(req, res, next) {
-  if (req.payload.role === "dev") {
+function verifyUser(req, res, next) {
+  if (req.payload.role === "user") {
     next() //if the role of the user is "dev" the user can continue to the route
   } else {
-    res.status(401).json({ errorMessage: "You're not a dev" })
+    res.status(401).json({ errorMessage: "You're not a user" })
   }
 }
 function verifyAdmin(req, res, next) {
@@ -28,4 +28,4 @@ function verifyAdmin(req, res, next) {
   }
 }
 
-module.exports = { verifyToken, verifyAdmin, verifyDev }
+module.exports = { verifyToken, verifyAdmin, verifyUser }

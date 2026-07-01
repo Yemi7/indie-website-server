@@ -1,10 +1,14 @@
 const router = require("express").Router()
-const { verifyToken } = require("../middleware/auth.middlewares")
+const {
+  verifyToken,
+  verifyAdmin,
+  verifyUser,
+} = require("../middleware/auth.middlewares")
 const Game = require("../models/Game.model")
 const Post = require("../models/Post.model")
 const { deletePostAndComments } = require("./post.routes")
 // create a game
-router.post("/", verifyToken, async (req, res, next) => {
+router.post("/", verifyToken, verifyUser, async (req, res, next) => {
   console.log(req.payload)
   const newGame = {
     title: req.body.title,
@@ -17,7 +21,6 @@ router.post("/", verifyToken, async (req, res, next) => {
     user: req.payload._id,
   }
   try {
-    //! implement security check so only a user can create a game
     const response = await Game.create(newGame)
     res.json(response)
     //! implement error message for when it fails
@@ -56,7 +59,6 @@ router.get("/:gameId", async (req, res, next) => {
 // update an individual game
 router.patch("/:gameId", verifyToken, async (req, res, next) => {
   console.log(req.params)
-  //! use findOne to implement check for userId before updating their own game
 
   // deconstructing the body
   const {
@@ -70,7 +72,16 @@ router.patch("/:gameId", verifyToken, async (req, res, next) => {
   } = req.body
 
   try {
-    // implement security check so only the user can update a game
+    const gameToUpdate = await Game.findOne({
+      _id: req.params.gameId,
+      user: req.payload._id,
+    })
+
+    if (!gameToUpdate) {
+      return res
+        .status(403)
+        .json({ errorMessage: "You are not allowed to update this game" })
+    }
 
     const updatedGame = {
       title,
@@ -81,20 +92,20 @@ router.patch("/:gameId", verifyToken, async (req, res, next) => {
       images,
       description,
     }
+
     const response = await Game.findByIdAndUpdate(
       req.params.gameId,
       updatedGame,
       { new: true },
     )
+
     res.json(response)
   } catch (error) {
     next(error)
   }
-  // implementation for verifyToken and verifyDev needs to be added
 })
 
-//! implement only an admin being able to delete a game
-router.delete("/:gameId", verifyToken, async (req, res, next) => {
+router.delete("/:gameId", verifyToken, verifyAdmin, async (req, res, next) => {
   console.log(req.params)
   try {
     const posts = await Post.find({ game: req.params.gameId })

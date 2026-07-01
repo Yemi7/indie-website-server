@@ -158,6 +158,15 @@ router.patch(
     }
 
     try {
+      // note, only the user can find their own user since we find it using payload anyway, so this may not be needed
+      const userToUpdate = await User.findOne({ _id: req.payload._id })
+
+      if (!userToUpdate) {
+        return res
+          .status(403)
+          .json({ message: "You are not allowed to update this user" })
+      }
+
       const updatedUser = {}
       if (email) {
         updatedUser.email = email

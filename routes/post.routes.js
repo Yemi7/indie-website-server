@@ -1,5 +1,5 @@
 const router = require("express").Router()
-const { verifyToken } = require("../middleware/auth.middlewares")
+const { verifyToken, verifyAdmin } = require("../middleware/auth.middlewares")
 const Post = require("../models/Post.model")
 const Game = require("../models/Game.model")
 const Comment = require("../models/Comment.model")
@@ -13,7 +13,19 @@ router.post("/", verifyToken, async (req, res, next) => {
     game: req.body.game, // the user will be on a game details page when making the post, it's id can be sent from there as params.
   }
   try {
-    //! use findOne to implement check for userId before creating their own post
+    const game = await Game.findOne({
+      _id: req.body.game,
+      user: req.payload._id,
+    })
+
+    if (!game) {
+      return res
+        .status(403)
+        .json({
+          errorMessage: "You are not allowed to create a post for this game",
+        })
+    }
+
     const response = await Post.create(newPost)
     res.json(response)
   } catch (error) {
@@ -51,15 +63,25 @@ router.get("/:postId", async (req, res, next) => {
 
 // update a post
 router.patch("/:postId", verifyToken, async (req, res, next) => {
-  //! use findOne to implement check for userId before editing their own post
-
   console.log(req.body)
   const { title, content, user, game } = req.body
+
   try {
-    const upadtedPost = { title, content, user, game }
+    const postToUpdate = await Post.findOne({
+      _id: req.params.postId,
+      user: req.payload._id,
+    })
+
+    if (!postToUpdate) {
+      return res
+        .status(403)
+        .json({ errorMessage: "You are not allowed to update this post" })
+    }
+
+    const updatedPost = { title, content, user, game }
     const response = await Post.findByIdAndUpdate(
       req.params.postId,
-      upadtedPost,
+      updatedPost,
       { new: true },
     )
     res.json(response)
@@ -73,15 +95,12 @@ const deletePostAndComments = async (postId) => {
   return await Post.findByIdAndDelete(postId)
 }
 
-//! implement only an admin deleting posts
-router.delete("/:postId", verifyToken, async (req, res, next) => {
+router.delete("/:postId", verifyToken, verifyAdmin, async (req, res, next) => {
   console.log(req.params)
 
   try {
     const response = await deletePostAndComments(req.params.postId)
     res.json(response)
-    // const response = await Post.findByIdAndDelete(req.params.postId)
-    // res.json(response)
   } catch (error) {
     next(error)
   }
