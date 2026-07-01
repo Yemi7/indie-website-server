@@ -20,12 +20,17 @@ const userSchema = new Schema(
     },
     profilePic: {
       type: String,
-      default: "placeholder url",
+      default:
+        "https://img.magnific.com/premium-vector/default-avatar-profile-icon-gray-placeholder-vector-illustration_514344-14757.jpg?semt=ais_hybrid&w=740&q=80",
     },
     role: {
       type: String,
       enum: ["user", "dev", "admin"],
       default: "user",
+    },
+    bio: {
+      type: String,
+      trim: true,
     },
   },
   {

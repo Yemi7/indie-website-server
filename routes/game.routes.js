@@ -13,6 +13,7 @@ router.post("/", verifyToken, async (req, res, next) => {
     engine: req.body.engine,
     images: req.body.images,
     cover: req.body.cover,
+    description: req.body.description,
     user: req.payload._id,
   }
   try {
@@ -58,7 +59,15 @@ router.patch("/:gameId", verifyToken, async (req, res, next) => {
   //! use findOne to implement check for userId before updating their own game
 
   // deconstructing the body
-  const { title, startDate, expectedRelease, engine, cover, images } = req.body
+  const {
+    title,
+    startDate,
+    expectedRelease,
+    engine,
+    cover,
+    images,
+    description,
+  } = req.body
 
   try {
     // implement security check so only the user can update a game
@@ -70,6 +79,7 @@ router.patch("/:gameId", verifyToken, async (req, res, next) => {
       engine,
       cover,
       images,
+      description,
     }
     const response = await Game.findByIdAndUpdate(
       req.params.gameId,

@@ -30,6 +30,14 @@ const gameSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+    status: {
+      type: String,
+      enum: ["released, developing, cancelled"],
+    },
+    description: {
+      type: String,
+      trim: true,
+    },
     // status of the game
   },
   {
