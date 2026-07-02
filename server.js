@@ -1,4 +1,8 @@
-process.loadEnvFile()
+try {
+  process.loadEnvFile()
+} catch(error) {
+  console.warn(".env file not found, using default environment values")
+}
 
 //app imports express
 const express = require("express")
