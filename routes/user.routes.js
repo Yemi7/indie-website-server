@@ -18,7 +18,7 @@ router.get("/", verifyToken, async (req, res, next) => {
 })
 
 // get user by id
-router.get("/user/:userId", verifyToken, async (req, res, next) => {
+router.get("/user/:userId", async (req, res, next) => {
   try {
     console.log(req.params)
     const response = await User.findById(req.params.userId).select("-password")
@@ -55,7 +55,7 @@ router.get("/comments", verifyToken, async (req, res, next) => {
 router.get("/games/:userId/public", async (req, res, next) => {
   try {
     const response = await Game.find({
-        user: req.params.userId
+      user: req.params.userId,
     })
     res.json(response)
   } catch (error) {
@@ -67,7 +67,7 @@ router.get("/games/:userId/public", async (req, res, next) => {
 router.get("/comments/:userId/public", async (req, res, next) => {
   try {
     const response = await Comment.find({
-        user: req.params.userId
+      user: req.params.userId,
     })
     res.json(response)
   } catch (error) {

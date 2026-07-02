@@ -66,11 +66,12 @@ router.patch("/:commentId", verifyToken, async (req, res, next) => {
 // delete a comment
 router.delete("/:commentId", verifyToken, async (req, res, next) => {
   console.log(req.params)
+  const isAdmin = req.payload.role === "admin"
+  const adminBypass = isAdmin
+    ? { _id: req.params.commentId }
+    : { _id: req.params.commentId, user: req.payload._id }
   try {
-    const commentToDelete = await Comment.findOne({
-      _id: req.params.commentId,
-      user: req.payload._id,
-    })
+    const commentToDelete = await Comment.findOne(adminBypass) // now if the user is an admin, the findOne won't check for the users id when looking for a comment
 
     if (!commentToDelete) {
       return res

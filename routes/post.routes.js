@@ -13,17 +13,17 @@ router.post("/", verifyToken, async (req, res, next) => {
     game: req.body.game, // the user will be on a game details page when making the post, it's id can be sent from there as params.
   }
   try {
-    const game = await Game.findOne({
+    const findgame = await Game.findOne({
       _id: req.body.game,
       user: req.payload._id,
     })
+    console.log(req.body.game)
 
-    if (!game) {
-      return res
-        .status(403)
-        .json({
-          errorMessage: "You are not allowed to create a post for this game",
-        })
+
+    if (!findgame) {
+      return res.status(403).json({
+        errorMessage: "You are not allowed to create a post for this game",
+      })
     }
 
     const response = await Post.create(newPost)
@@ -40,7 +40,7 @@ router.get("/:gameId/by-game", async (req, res, next) => {
     const response = await Post.find({
       game: req.params.gameId,
     }) // add game id check here
-      .populate("game", "title cover engine")
+      .populate("game", "title cover engine genre")
       .populate("user", "username profilePic")
     res.json(response)
   } catch (error) {
@@ -53,7 +53,7 @@ router.get("/:postId", async (req, res, next) => {
   console.log(req.params)
   try {
     const response = await Post.findById(req.params.postId)
-      .populate("game", "title cover engine")
+      .populate("game", "title cover engine genre")
       .populate("user", "username profilePic")
     res.json(response)
   } catch (error) {

@@ -18,6 +18,10 @@ const gameSchema = new Schema(
       required: true,
       // implement enum for established engines
     },
+    genre: {
+      type: String,
+      trim: true,
+    },
     cover: {
       type: String,
       required: true,
