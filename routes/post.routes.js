@@ -5,6 +5,11 @@ const Game = require("../models/Game.model")
 const Comment = require("../models/Comment.model")
 // create post route
 router.post("/", verifyToken, async (req, res, next) => {
+  if (!req.body.title) {
+    return res
+      .status(400)
+      .json({ message: "Please enter a title for your post." })
+  }
   console.log(req.body)
   const newPost = {
     title: req.body.title,
@@ -18,7 +23,6 @@ router.post("/", verifyToken, async (req, res, next) => {
       user: req.payload._id,
     })
     console.log(req.body.game)
-
 
     if (!findgame) {
       return res.status(403).json({
