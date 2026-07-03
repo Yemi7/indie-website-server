@@ -3,6 +3,10 @@ const jwt = require("jsonwebtoken")
 function verifyToken(req, res, next) {
   console.log(req.headers)
   try {
+    const authHeader = req.headers.authorization
+    if (!authHeader) {
+      return res.status(401).json({ errorMessage: "No token provided" })
+    }
     const authToken = req.headers.authorization.split(" ")[1]
     const payload = jwt.verify(authToken, process.env.TOKEN_SECRET)
     req.payload = payload
@@ -10,6 +14,7 @@ function verifyToken(req, res, next) {
 
     next()
   } catch (error) {
+    res.status(401).json({ errorMessage: "Invalid Token" })
     next(error)
   }
 }

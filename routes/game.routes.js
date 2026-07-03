@@ -9,6 +9,12 @@ const Post = require("../models/Post.model")
 const { deletePostAndComments } = require("./post.routes")
 // create a game
 router.post("/", verifyToken, verifyUser, async (req, res, next) => {
+  const { title, engine, description } = req.body
+  if (!title || !engine || !description) {
+    return res
+      .status(400)
+      .json({ message: "Please fill in all required fields." })
+  }
   console.log(req.payload)
   const newGame = {
     title: req.body.title,
@@ -90,7 +96,7 @@ router.patch("/:gameId", verifyToken, async (req, res, next) => {
       startDate,
       expectedRelease,
       engine,
-      // genre,
+      genre,
       cover,
       images,
       description,
